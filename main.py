@@ -56,7 +56,7 @@ async def birthday_checker():
                 else:
                     print("Couldn't Assign Role!")
             else:
-                member = guild.get_member(user_id)
+                member = await guild.fetch_member(user_id)
                 if member:
                     roles_to_remove = [
                         discord.utils.get(guild.roles, name="Bday Boy"),
@@ -91,6 +91,13 @@ async def on_ready():
 @bot.command()
 async def hello(ctx):
     await ctx.send('Hello!')
+
+
+@bot.command()
+@commands.has_permissions(administrator=True)
+async def refresh(ctx):
+    await birthday_checker()
+    await ctx.send('Birthday roles have been refreshed manually!')
 
 
 @bot.group()
