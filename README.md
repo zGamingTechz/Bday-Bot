@@ -1,0 +1,1 @@
+Discord bot to track everyone's bdays and assign them Bday role automatically
