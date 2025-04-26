@@ -40,13 +40,12 @@ async def birthday_checker():
 
             bday_day, bday_month = birthday.split()
             if int(bday_day) == current_day and bday_month.lower() == current_month:
-                print("Bday found!")
                 member = await guild.fetch_member(user_id)
                 if member:
                     role_name = "Bday Person"
-                    if gender == '1':
+                    if gender == 'Boy':
                         role_name = "Bday Boy"
-                    elif gender == '2':
+                    elif gender == 'Girl':
                         role_name = "Bday Girl"
 
                     role = discord.utils.get(guild.roles, name=role_name)
@@ -104,6 +103,7 @@ async def refresh(ctx):
 async def bday(ctx):
     if ctx.invoked_subcommand is None:
         await ctx.send('Use `%bday add` to add your birthday.')
+
 
 @bday.command()
 async def add(ctx):
