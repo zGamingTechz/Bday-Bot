@@ -96,4 +96,67 @@ async def show(ctx):
     await ctx.send('You have not added your birthday yet. Use `%bday add`.')
 
 
+@bday.command()
+async def edit(ctx):
+    if not os.path.exists('bdays.csv'):
+        await ctx.send('No birthdays saved yet.')
+        return
+
+    with open('bdays.csv', 'r', newline='') as f:
+        reader = csv.reader(f)
+        next(reader)
+        for row in reader:
+            if str(ctx.author.id) == row[0]:
+                break
+        else:
+            await ctx.send('You have not added your birthday yet. Use `%bday add` first.')
+            return
+
+    await ctx.send('Please enter your new birthday (e.g., `6 November`):')
+
+    def check(m):
+        return m.author == ctx.author and m.channel == ctx.channel
+
+    try:
+        msg = await bot.wait_for('message', timeout=30.0, check=check)
+        parts = msg.content.lower().replace(",", "").split()
+        if len(parts) != 2:
+            await ctx.send('Invalid format. Please use `6 November` or `6 Nov`.')
+            return
+
+        day, month = parts
+        if not day.isdigit():
+            await ctx.send('Invalid day. Please enter a number for the day.')
+            return
+
+        month_full = None
+        for m in months:
+            if m.startswith(month):
+                month_full = m
+                break
+
+        if not month_full:
+            await ctx.send('Invalid month name.')
+            return
+
+        rows = []
+        with open('bdays.csv', 'r', newline='') as f:
+            reader = csv.reader(f)
+            header = next(reader)
+            for row in reader:
+                if str(ctx.author.id) == row[0]:
+                    row[1] = f'{int(day)} {month_full.capitalize()}'
+                rows.append(row)
+
+        with open('bdays.csv', 'w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow(header)
+            writer.writerows(rows)
+
+        await ctx.send(f'Your birthday has been updated to: {int(day)} {month_full.capitalize()}')
+
+    except asyncio.TimeoutError:
+        await ctx.send('You took too long to respond.')
+
+
 bot.run(TOKEN.token)
