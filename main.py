@@ -78,4 +78,22 @@ async def add(ctx):
     except asyncio.TimeoutError:
         await ctx.send('You took too long to respond.')
 
+
+@bday.command()
+async def show(ctx):
+    if not os.path.exists('bdays.csv'):
+        await ctx.send('No birthdays saved yet.')
+        return
+
+    with open('bdays.csv', 'r', newline='') as f:
+        reader = csv.reader(f)
+        next(reader)
+        for row in reader:
+            if str(ctx.author.id) == row[0]:
+                await ctx.send(f'Your birthday is: {row[1]}')
+                return
+
+    await ctx.send('You have not added your birthday yet. Use `%bday add`.')
+
+
 bot.run(TOKEN.token)
