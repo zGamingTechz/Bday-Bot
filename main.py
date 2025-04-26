@@ -355,4 +355,58 @@ async def wish_disable(ctx):
         await ctx.send("No Happy Bday channel exists to disable.")
 
 
+@bday.command()
+async def help(ctx):
+    embed = discord.Embed(
+        title="🎉 Birthday Bot Commands 🎉",
+        description="Here are all the available commands to manage your birthday settings:",
+        color=discord.Color.blue()
+    )
+
+    embed.add_field(
+        name="%bday add",
+        value="Add your birthday. Format: `6 November`",
+        inline=False
+    )
+    embed.add_field(
+        name="%bday show",
+        value="Show your current saved birthday.",
+        inline=False
+    )
+    embed.add_field(
+        name="%bday edit",
+        value="Edit your birthday.",
+        inline=False
+    )
+    embed.add_field(
+        name="%bday gender",
+        value="Select your gender for the birthday role.",
+        inline=False
+    )
+    embed.add_field(
+        name="Administrator Commands",
+        value="These commands are for admins to manage birthday wish channels and roles.",
+        inline=False
+    )
+    embed.add_field(
+        name="%bday wish_enable",
+        value="Enable the birthday wish channel and role assignments.",
+        inline=False
+    )
+    embed.add_field(
+        name="%bday wish_disable",
+        value="Disable the birthday wish channel and role assignments.",
+        inline=False
+    )
+    embed.add_field(
+        name="Note",
+        value="Make sure to add your birthday to receive wishes and roles on your special day! 🎂",
+        inline=False
+    )
+
+    embed.set_footer(text=f"Made by Gaming Tech")
+
+    await ctx.send(embed=embed)
+
+
 bot.run(TOKEN.token)
