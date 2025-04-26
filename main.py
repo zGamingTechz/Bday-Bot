@@ -31,6 +31,8 @@ async def birthday_checker():
     current_day = now.day
     current_month = now.strftime('%B').lower()
 
+    happy_bday_channel = discord.utils.get(guild.text_channels, name="happy-bday")
+
     with open('bdays.csv', 'r', newline='') as f:
         reader = csv.DictReader(f)
         for row in reader:
@@ -52,6 +54,29 @@ async def birthday_checker():
                     if role and role not in member.roles:
                         await member.add_roles(role)
                         print(f'Gave {role.name} role to {member.name}')
+
+                    if happy_bday_channel:
+                        embed = discord.Embed(
+                            title=f"🎉🎂 **Happy Birthday {member.display_name}!** 🎂🎉",
+                            description=f"**Wishing you a fabulous day filled with happiness, laughter, and love!** 🎁🎉",
+                            color=discord.Color.magenta()
+                        )
+                        embed.add_field(
+                            name="🎁 Your Special Day",
+                            value="Today marks the beginning of another year of amazing adventures, memories, and growth! 🌟",
+                            inline=False
+                        )
+                        embed.add_field(
+                            name="🎉 Enjoy Your Day!",
+                            value="Let’s celebrate you today and always! 🥳 Keep shining and keep being awesome! 🌟",
+                            inline=False
+                        )
+                        embed.set_footer(text="Your Friends🎈🎉")
+
+                        embed.set_thumbnail(url="https://media.giphy.com/media/3oEhn78T277GKAq6Gc/giphy.gif")
+
+                        await happy_bday_channel.send(embed=embed)
+                        await happy_bday_channel.send(f"🎉 **Happy Birthday {member.mention}!** 🎉")
                 else:
                     print("Couldn't Assign Role!")
             else:
@@ -301,6 +326,7 @@ async def gender(ctx):
 @bday.command()
 @commands.has_permissions(administrator=True)
 async def wish_enable(ctx):
+    print("h")
     guild = ctx.guild
     existing_channel = discord.utils.get(guild.text_channels, name="happy-bday")
 
