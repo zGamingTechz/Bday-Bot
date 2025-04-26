@@ -27,7 +27,7 @@ async def birthday_checker():
     if guild is None:
         return
 
-    now = datetime.utcnow() + timedelta(hours=5, minutes=30)
+    now = datetime.now() + timedelta(hours=5, minutes=30)
     current_day = now.day
     current_month = now.strftime('%B').lower()
 
@@ -40,7 +40,8 @@ async def birthday_checker():
 
             bday_day, bday_month = birthday.split()
             if int(bday_day) == current_day and bday_month.lower() == current_month:
-                member = guild.get_member(user_id)
+                print("Bday found!")
+                member = await guild.fetch_member(user_id)
                 if member:
                     role_name = "Bday Person"
                     if gender == '1':
@@ -52,6 +53,8 @@ async def birthday_checker():
                     if role and role not in member.roles:
                         await member.add_roles(role)
                         print(f'Gave {role.name} role to {member.name}')
+                else:
+                    print("Couldn't Assign Role!")
             else:
                 member = guild.get_member(user_id)
                 if member:
@@ -82,6 +85,7 @@ async def on_ready():
             print(f'Created role: {role_name}')
 
     birthday_checker.start()
+    print("Bdays loaded!")
 
 
 @bot.command()
