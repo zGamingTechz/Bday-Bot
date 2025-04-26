@@ -216,4 +216,66 @@ async def timezone(ctx):
         await ctx.send('You took too long to respond.')
 
 
+@bday.command()
+async def gender(ctx):
+    await ctx.send('Please select your gender:\n1. Boy\n2. Girl\n3. Dont wanna disclose\n(You can reply with the number or the text)')
+
+    def check(m):
+        return m.author == ctx.author and m.channel == ctx.channel
+
+    try:
+        msg = await bot.wait_for('message', timeout=30.0, check=check)
+        gender_input = msg.content.strip().lower()
+
+        gender_map = {
+            '1': 'Boy',
+            '2': 'Girl',
+            '3': 'Dont wanna disclose',
+            'boy': 'Boy',
+            'girl': 'Girl',
+            'dont wanna disclose': 'Dont wanna disclose'
+        }
+
+        if gender_input not in gender_map:
+            await ctx.send('Invalid option. Please choose 1, 2, 3, or type Boy, Girl, Dont wanna disclose.')
+            return
+
+        selected_gender = gender_map[gender_input]
+
+        if not os.path.exists('bdays.csv'):
+            await ctx.send('No birthdays saved yet.')
+            return
+
+        rows = []
+        found = False
+
+        with open('bdays.csv', 'r', newline='') as f:
+            reader = csv.reader(f)
+            header = next(reader)
+            if 'Gender' not in header:
+                header.append('Gender')
+            for row in reader:
+                if str(ctx.author.id) == row[0]:
+                    if len(row) < len(header):
+                        row.append(selected_gender)
+                    else:
+                        row[header.index('Gender')] = selected_gender
+                    found = True
+                rows.append(row)
+
+        if not found:
+            await ctx.send('You need to add your birthday first using `%bday add`.')
+            return
+
+        with open('bdays.csv', 'w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow(header)
+            writer.writerows(rows)
+
+        await ctx.send(f'Your gender has been updated to: {selected_gender}')
+
+    except asyncio.TimeoutError:
+        await ctx.send('You took too long to respond.')
+
+
 bot.run(TOKEN.token)
