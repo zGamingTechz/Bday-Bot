@@ -4,6 +4,7 @@ import TOKEN
 import csv
 import os
 import asyncio
+import pytz
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -154,6 +155,62 @@ async def edit(ctx):
             writer.writerows(rows)
 
         await ctx.send(f'Your birthday has been updated to: {int(day)} {month_full.capitalize()}')
+
+    except asyncio.TimeoutError:
+        await ctx.send('You took too long to respond.')
+
+
+@bday.command()
+async def timezone(ctx):
+    await ctx.send('Please enter your timezone (e.g., `Kolkata`, `London`):')
+
+    def check(m):
+        return m.author == ctx.author and m.channel == ctx.channel
+
+    try:
+        msg = await bot.wait_for('message', timeout=30.0, check=check)
+        timezone_input = msg.content.strip().lower()
+
+        if not os.path.exists('bdays.csv'):
+            await ctx.send('No birthdays saved yet.')
+            return
+
+        with open('bdays.csv', 'r', newline='') as f:
+            reader = csv.reader(f)
+            next(reader)
+            for row in reader:
+                if str(ctx.author.id) == row[0]:
+                    break
+            else:
+                await ctx.send('You need to add your birthday first using `%bday add`.')
+                return
+
+        timezone_found = None
+
+        for tz in pytz.all_timezones:
+            if timezone_input in tz.lower():
+                timezone_found = tz
+                break
+
+        if not timezone_found:
+            await ctx.send('Invalid timezone. Please provide a valid timezone like `IST` or `Asia/Kolkata`.')
+            return
+
+        rows = []
+        with open('bdays.csv', 'r', newline='') as f:
+            reader = csv.reader(f)
+            header = next(reader)
+            for row in reader:
+                if str(ctx.author.id) == row[0]:
+                    row.append(timezone_found)
+                rows.append(row)
+
+        with open('bdays.csv', 'w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow(header + ['Timezone'])
+            writer.writerows(rows)
+
+        await ctx.send(f'Your timezone has been added: {timezone_found}')
 
     except asyncio.TimeoutError:
         await ctx.send('You took too long to respond.')
