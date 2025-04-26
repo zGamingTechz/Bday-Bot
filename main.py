@@ -20,6 +20,17 @@ months = [
 async def on_ready():
     print(f'Logged in as {bot.user}')
 
+    guild = discord.utils.get(bot.guilds)  # First guild the bot is connected to
+
+    role_names = ['Bday Boy', 'Bday Girl', 'Bday Person']
+    pink = discord.Colour.from_rgb(255, 105, 180)  # Bright pink
+
+    for role_name in role_names:
+        role = discord.utils.get(guild.roles, name=role_name)
+        if role is None:
+            await guild.create_role(name=role_name, colour=pink)
+            print(f'Created role: {role_name}')
+
 @bot.command()
 async def hello(ctx):
     await ctx.send('Hello!')
