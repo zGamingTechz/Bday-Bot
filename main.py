@@ -298,4 +298,35 @@ async def gender(ctx):
         await ctx.send('You took too long to respond.')
 
 
+@bday.command()
+@commands.has_permissions(administrator=True)
+async def wish_enable(ctx):
+    guild = ctx.guild
+    existing_channel = discord.utils.get(guild.text_channels, name="happy-bday")
+
+    if not existing_channel:
+        overwrites = {
+            guild.default_role: discord.PermissionOverwrite(send_messages=False)
+        }
+        happy_bday_channel = await guild.create_text_channel('happy-bday', overwrites=overwrites)
+        await happy_bday_channel.send("The Happy Birthday channel is now live! 🎉")
+
+    await ctx.send("Birthday wishes have been enabled! 🎂🎉")
+
+    await birthday_checker()
+
+
+@bday.command()
+@commands.has_permissions(administrator=True)
+async def wish_disable(ctx):
+    guild = ctx.guild
+    existing_channel = discord.utils.get(guild.text_channels, name="happy-bday")
+
+    if existing_channel:
+        await existing_channel.delete()
+        await ctx.send("Happy Bday channel has been deleted. Birthday wishes have been disabled.")
+    else:
+        await ctx.send("No Happy Bday channel exists to disable.")
+
+
 bot.run(TOKEN.token)
